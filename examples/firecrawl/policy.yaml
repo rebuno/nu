@@ -1,0 +1,8 @@
+rules:
+  - id: firecrawl-reads
+    when:
+      targets:
+        - firecrawl__search
+        - firecrawl__scrape
+    then:
+      decision: allow

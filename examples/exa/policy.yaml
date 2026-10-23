@@ -1,0 +1,8 @@
+rules:
+  - id: exa-reads
+    when:
+      targets:
+        - exa__search
+        - exa__contents
+    then:
+      decision: allow

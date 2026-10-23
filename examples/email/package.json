@@ -1,0 +1,42 @@
+{
+  "name": "nu-email",
+  "version": "0.1.0",
+  "description": "Read, draft, send, and file email over IMAP and SMTP",
+  "type": "module",
+  "keywords": [
+    "nu-package"
+  ],
+  "files": [
+    "lib",
+    "tools",
+    "watcher.ts",
+    "policy.yaml"
+  ],
+  "dependencies": {
+    "imapflow": "^1.0.0",
+    "mailparser": "^3.7.0",
+    "nodemailer": "^7.0.0"
+  },
+  "nu": {
+    "namespace": "email",
+    "tools": [
+      "tools/*/tool.yaml"
+    ],
+    "extensions": [
+      "watcher.ts"
+    ],
+    "policy": "policy.yaml",
+    "secrets": [
+      "EMAIL_PASSWORD"
+    ],
+    "config": [
+      "address",
+      "imapHost",
+      "smtpHost"
+    ]
+  },
+  "devDependencies": {
+    "@rebuno/nu-types": "^0.1.0",
+    "@types/nodemailer": "^8.0.2"
+  }
+}

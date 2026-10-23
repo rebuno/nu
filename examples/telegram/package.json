@@ -1,0 +1,28 @@
+{
+  "name": "nu-telegram",
+  "version": "0.1.0",
+  "description": "Telegram channel adapter for Nu",
+  "type": "module",
+  "keywords": [
+    "nu-package"
+  ],
+  "exports": "./src/index.ts",
+  "files": [
+    "src"
+  ],
+  "nu": {
+    "namespace": "telegram",
+    "extensions": [
+      "src/index.ts"
+    ],
+    "secrets": [
+      "TELEGRAM_TOKEN"
+    ],
+    "config": [
+      "userId"
+    ]
+  },
+  "devDependencies": {
+    "@rebuno/nu-types": "^0.1.0"
+  }
+}

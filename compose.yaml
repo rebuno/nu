@@ -1,0 +1,80 @@
+services:
+  nu:
+    build: .
+    image: ghcr.io/rebuno/nu:latest
+    restart: unless-stopped
+    environment:
+      SANDBOX_URL: http://sandbox:4121
+    user: "${UID:-1000}:${GID:-1000}"
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "127.0.0.1:4122:4122"
+    volumes:
+      - type: bind
+        source: ${NU_HOME:-~/.nu}
+        target: /home/nu/.nu
+        bind:
+          create_host_path: false
+  sandbox:
+    build: .
+    image: ghcr.io/rebuno/nu:latest
+    restart: unless-stopped
+    user: "${UID:-1000}:${GID:-1000}"
+    command: ["node", "--import", "tsx", "src/sandbox/main.ts"]
+    environment:
+      HOME: /home/nu/.nu/workspace/.home
+      NPM_CONFIG_PREFIX: /home/nu/.nu/workspace/.home/.local
+      PATH: /home/nu/.nu/workspace/.home/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    read_only: true
+    tmpfs:
+      - /tmp:exec
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 4g
+    pids_limit: 1024
+    volumes:
+      - type: bind
+        source: ${NU_HOME:-~/.nu}/workspace
+        target: /home/nu/.nu/workspace
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${NU_HOME:-~/.nu}/sandbox
+        target: /run/nu-sandbox
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${NU_HOME:-~/.nu}/skills
+        target: /home/nu/.nu/skills
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${NU_HOME:-~/.nu}/packages
+        target: /home/nu/.nu/packages
+        read_only: true
+        bind:
+          create_host_path: false
+  dashboard:
+    image: ghcr.io/rebuno/dashboard:latest
+    profiles: [dashboard]
+    restart: unless-stopped
+    depends_on: [nu]
+    user: "${UID:-1000}:${GID:-1000}"
+    environment:
+      REBUNO_URL: http://nu:4117
+    command:
+      - sh
+      - -c
+      - until [ -s /run/nu/admin_token ]; do sleep 1; done; REBUNO_API_KEY=$$(cat /run/nu/admin_token) exec node server.js
+    ports:
+      - "127.0.0.1:${NU_DASHBOARD_PORT:-4116}:3000"
+      - "[::1]:${NU_DASHBOARD_PORT:-4116}:3000"
+    volumes:
+      - type: bind
+        source: ${NU_HOME:-~/.nu}/secrets
+        target: /run/nu
+        read_only: true

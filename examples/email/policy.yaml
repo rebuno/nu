@@ -1,0 +1,9 @@
+rules:
+  - id: email-reads
+    when:
+      targets:
+        - email__search
+        - email__read
+        - email__draft
+    then:
+      decision: allow

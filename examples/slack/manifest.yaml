@@ -1,0 +1,33 @@
+display_information:
+  name: Nu
+features:
+  bot_user:
+    display_name: Nu
+    always_online: true
+  app_home:
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+  slash_commands:
+    - command: /nu
+      description: Run a Nu command, such as /nu status
+      usage_hint: "<command> [arguments], or nothing to list commands"
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - commands
+      - im:history
+      - channels:history
+      - groups:history
+      - files:read
+      - files:write
+settings:
+  event_subscriptions:
+    bot_events:
+      - message.im
+      - message.channels
+      - message.groups
+  interactivity:
+    is_enabled: true
+  socket_mode_enabled: true

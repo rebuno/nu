@@ -1,0 +1,20 @@
+{
+  "name": "nu-tavily",
+  "version": "0.1.0",
+  "description": "Web search and page reading through Tavily",
+  "type": "module",
+  "keywords": [
+    "nu-package"
+  ],
+  "files": [
+    "tools",
+    "policy.yaml"
+  ],
+  "nu": {
+    "namespace": "tavily",
+    "tools": [
+      "tools/*/tool.yaml"
+    ],
+    "policy": "policy.yaml"
+  }
+}

@@ -1,0 +1,11 @@
+name: tavily__extract
+version: 1
+description: Read web pages and return their content as markdown.
+args_schema:
+  type: object
+  required: [urls]
+  properties:
+    urls: { type: array, items: { type: string }, description: "Up to 20 http(s) URLs" }
+idempotency: safe_to_retry
+secrets: [TAVILY_API_KEY]
+entry: index.ts

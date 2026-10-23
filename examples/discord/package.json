@@ -1,0 +1,31 @@
+{
+  "name": "nu-discord",
+  "version": "0.1.0",
+  "description": "Discord channel adapter for Nu",
+  "type": "module",
+  "keywords": [
+    "nu-package"
+  ],
+  "exports": "./src/index.ts",
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "discord.js": "^14.27.0"
+  },
+  "nu": {
+    "namespace": "discord",
+    "extensions": [
+      "src/index.ts"
+    ],
+    "secrets": [
+      "DISCORD_TOKEN"
+    ],
+    "config": [
+      "userId"
+    ]
+  },
+  "devDependencies": {
+    "@rebuno/nu-types": "^0.1.0"
+  }
+}

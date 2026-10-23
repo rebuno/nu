@@ -1,0 +1,21 @@
+name: email__send
+version: 1
+description: Send an email from the user's address.
+args_schema:
+  type: object
+  required: [to, subject, text]
+  properties:
+    to: { type: array, items: { type: string } }
+    cc: { type: array, items: { type: string } }
+    subject: { type: string }
+    text: { type: string, description: "Plain text body" }
+    reply_to:
+      type: object
+      description: "The message this replies to, to keep the thread"
+      required: [uid]
+      properties:
+        uid: { type: integer }
+        folder: { type: string, description: "inbox by default" }
+idempotency: at_most_once
+secrets: [EMAIL_PASSWORD]
+entry: index.ts

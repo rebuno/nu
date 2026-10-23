@@ -1,0 +1,21 @@
+name: email__draft
+version: 1
+description: Save an email to the user's drafts folder, for the user to review and send.
+args_schema:
+  type: object
+  required: [to, subject, text]
+  properties:
+    to: { type: array, items: { type: string } }
+    cc: { type: array, items: { type: string } }
+    subject: { type: string }
+    text: { type: string, description: "Plain text body" }
+    reply_to:
+      type: object
+      description: "The message this replies to, to keep the thread"
+      required: [uid]
+      properties:
+        uid: { type: integer }
+        folder: { type: string, description: "inbox by default" }
+idempotency: safe_to_retry
+secrets: [EMAIL_PASSWORD]
+entry: index.ts

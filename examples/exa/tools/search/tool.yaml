@@ -1,0 +1,14 @@
+name: exa__search
+version: 1
+description: Search the web by meaning. Describe the page you want, such as "a blog post comparing Postgres queues". Returns titles, URLs, dates, and highlights.
+args_schema:
+  type: object
+  required: [query]
+  properties:
+    query: { type: string }
+    limit: { type: integer, description: "Results to return, 8 by default" }
+    domains: { type: array, items: { type: string }, description: "Only return results from these domains" }
+    since: { type: string, description: "Only pages published after this ISO date" }
+idempotency: safe_to_retry
+secrets: [EXA_API_KEY]
+entry: index.ts

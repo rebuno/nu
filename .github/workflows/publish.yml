@@ -1,0 +1,67 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the tag matches the version
+        run: test "${GITHUB_REF_NAME#v}" = "$(node -p "require('./package.json').version")"
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/metadata-action@v6
+        id: meta
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - uses: docker/build-push-action@v7
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the tag matches the version
+        run: test "${GITHUB_REF_NAME#v}" = "$(node -p "require('./package.json').version")"
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:client
+      - run: pnpm run build:types
+
+      - run: npm publish --access public ${{ github.event.release.prerelease && '--tag next' || '' }}
+        working-directory: dist/client
+
+      - run: npm publish --access public ${{ github.event.release.prerelease && '--tag next' || '' }}
+        working-directory: dist/types

@@ -1,0 +1,13 @@
+name: email__move
+version: 1
+description: Move messages to another folder, such as archive, trash, or a folder name.
+args_schema:
+  type: object
+  required: [uids, to]
+  properties:
+    uids: { type: array, items: { type: integer } }
+    folder: { type: string, description: "The folder they are in, inbox by default" }
+    to: { type: string }
+idempotency: safe_to_retry
+secrets: [EMAIL_PASSWORD]
+entry: index.ts

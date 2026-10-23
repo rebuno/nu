@@ -1,0 +1,8 @@
+rules:
+  - id: tavily-reads
+    when:
+      targets:
+        - tavily__search
+        - tavily__extract
+    then:
+      decision: allow

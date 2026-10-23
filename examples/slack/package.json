@@ -1,0 +1,30 @@
+{
+  "name": "nu-slack",
+  "version": "0.1.0",
+  "description": "Slack channel adapter for Nu",
+  "type": "module",
+  "keywords": [
+    "nu-package"
+  ],
+  "exports": "./src/index.ts",
+  "files": [
+    "src",
+    "manifest.yaml"
+  ],
+  "nu": {
+    "namespace": "slack",
+    "extensions": [
+      "src/index.ts"
+    ],
+    "secrets": [
+      "SLACK_BOT_TOKEN",
+      "SLACK_APP_TOKEN"
+    ],
+    "config": [
+      "userId"
+    ]
+  },
+  "devDependencies": {
+    "@rebuno/nu-types": "^0.1.0"
+  }
+}

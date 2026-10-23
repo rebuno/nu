@@ -1,0 +1,14 @@
+name: tavily__search
+version: 1
+description: Search the web. Returns titles, URLs, and the relevant text from each page.
+args_schema:
+  type: object
+  required: [query]
+  properties:
+    query: { type: string }
+    limit: { type: integer, description: "Results to return, 8 by default" }
+    topic: { type: string, enum: [general, news, finance], description: "general by default" }
+    days: { type: integer, description: "Only results from the last this many days" }
+idempotency: safe_to_retry
+secrets: [TAVILY_API_KEY]
+entry: index.ts

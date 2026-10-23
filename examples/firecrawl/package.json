@@ -1,0 +1,20 @@
+{
+  "name": "nu-firecrawl",
+  "version": "0.1.0",
+  "description": "Web search and page reading through Firecrawl",
+  "type": "module",
+  "keywords": [
+    "nu-package"
+  ],
+  "files": [
+    "tools",
+    "policy.yaml"
+  ],
+  "nu": {
+    "namespace": "firecrawl",
+    "tools": [
+      "tools/*/tool.yaml"
+    ],
+    "policy": "policy.yaml"
+  }
+}

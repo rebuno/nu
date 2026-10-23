@@ -1,0 +1,12 @@
+name: firecrawl__search
+version: 1
+description: Search the web. Returns titles, URLs, and snippets.
+args_schema:
+  type: object
+  required: [query]
+  properties:
+    query: { type: string }
+    limit: { type: integer, description: "Results to return, 8 by default" }
+idempotency: safe_to_retry
+secrets: [FIRECRAWL_API_KEY]
+entry: index.ts

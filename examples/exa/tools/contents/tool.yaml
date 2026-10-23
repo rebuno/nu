@@ -1,0 +1,11 @@
+name: exa__contents
+version: 1
+description: Read web pages and return their text.
+args_schema:
+  type: object
+  required: [urls]
+  properties:
+    urls: { type: array, items: { type: string }, description: "http(s) URLs" }
+idempotency: safe_to_retry
+secrets: [EXA_API_KEY]
+entry: index.ts

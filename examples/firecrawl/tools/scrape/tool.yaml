@@ -1,0 +1,11 @@
+name: firecrawl__scrape
+version: 1
+description: Read a web page and return its main content as markdown.
+args_schema:
+  type: object
+  required: [url]
+  properties:
+    url: { type: string, description: "http(s) URL" }
+idempotency: safe_to_retry
+secrets: [FIRECRAWL_API_KEY]
+entry: index.ts
