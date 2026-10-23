@@ -4,6 +4,7 @@ services:
     image: ghcr.io/rebuno/nu:latest
     restart: unless-stopped
     environment:
+      NU_HOME: /home/nu/.nu
       SANDBOX_URL: http://sandbox:4121
     user: "${UID:-1000}:${GID:-1000}"
     env_file:
