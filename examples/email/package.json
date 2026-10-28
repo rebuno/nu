@@ -15,7 +15,7 @@
   "dependencies": {
     "imapflow": "^2.9.1",
     "mailparser": "^3.7.0",
-    "nodemailer": "^7.0.0"
+    "nodemailer": "^10.2.1"
   },
   "nu": {
     "namespace": "email",
