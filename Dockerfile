@@ -1,6 +1,6 @@
 FROM ghcr.io/rebuno/rebuno:latest AS kernel
 
-FROM node:24-trixie-slim
+FROM node:25-trixie-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl gh git postgresql ripgrep libnss-wrapper && \
