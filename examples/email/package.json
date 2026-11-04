@@ -13,8 +13,8 @@
     "policy.yaml"
   ],
   "dependencies": {
-    "imapflow": "^2.9.1",
-    "mailparser": "^3.7.0",
+    "imapflow": "^2.10.0",
+    "mailparser": "^3.14.1",
     "nodemailer": "^10.2.1"
   },
   "nu": {
