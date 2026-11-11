@@ -13,9 +13,9 @@
     "policy.yaml"
   ],
   "dependencies": {
-    "imapflow": "^2.10.0",
-    "mailparser": "^3.14.1",
-    "nodemailer": "^10.2.1"
+    "imapflow": "^2.11.0",
+    "mailparser": "^3.14.2",
+    "nodemailer": "^10.4.0"
   },
   "nu": {
     "namespace": "email",
