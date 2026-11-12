@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 
-import { Type } from "@earendil-works/pi-ai";
+import { bool, obj, opt, str } from "@earendil-works/pi-schema";
 import { Cron } from "croner";
 import { execution } from "rebuno";
 
@@ -17,28 +17,27 @@ export function scheduleTools(
     label: "Schedule",
     description:
       "Schedule instructions to run later, once at a time or repeatedly on a cron expression. Each run is a separate turn that starts from the instructions alone, so make them self-contained. Its reply is posted to the conversation.",
-    parameters: Type.Object({
-      instructions: Type.String(),
-      cron: Type.Optional(
-        Type.String({ description: "Five-field cron expression" }),
-      ),
-      at: Type.Optional(
-        Type.String({ description: "ISO 8601 time with offset, for one run" }),
-      ),
-      time_zone: Type.Optional(Type.String({ description: "IANA time zone" })),
-      conversation: Type.Optional(
-        Type.String({
-          description:
-            "Conversation key to run in and post to: `main` for the user's direct conversation, or `<channel>:<id>` for a channel or thread. Defaults to this conversation.",
-        }),
-      ),
-      isolated: Type.Optional(
-        Type.Boolean({
-          description:
-            "Run each time in a fresh session that keeps its work out of the conversation's history, for briefs and reports. The reply is still posted.",
-        }),
-      ),
-    }),
+    parameters: obj(
+      {
+        instructions: str(),
+        cron: opt(str({ description: "Five-field cron expression" })),
+        at: opt(str({ description: "ISO 8601 time with offset, for one run" })),
+        time_zone: opt(str({ description: "IANA time zone" })),
+        conversation: opt(
+          str({
+            description:
+              "Conversation key to run in and post to: `main` for the user's direct conversation, or `<channel>:<id>` for a channel or thread. Defaults to this conversation.",
+          }),
+        ),
+        isolated: opt(
+          bool({
+            description:
+              "Run each time in a fresh session that keeps its work out of the conversation's history, for briefs and reports. The reply is still posted.",
+          }),
+        ),
+      },
+      { open: true },
+    ),
     execute: async (_id, args) => {
       if (!args.cron === !args.at)
         throw new Error("give exactly one of cron and at");
@@ -70,7 +69,7 @@ export function scheduleTools(
     name: "schedule_list",
     label: "Schedules",
     description: "List schedules.",
-    parameters: Type.Object({}),
+    parameters: obj({}, { open: true }),
     execute: async () => {
       const rows = db
         .prepare("select * from schedules order by created_at")
@@ -90,7 +89,7 @@ export function scheduleTools(
     name: "schedule_delete",
     label: "Unschedule",
     description: "Delete a schedule by ID.",
-    parameters: Type.Object({ id: Type.String() }),
+    parameters: obj({ id: str() }, { open: true }),
     execute: async (_id, { id }) => {
       const { changes } = db
         .prepare("delete from schedules where id = ?")

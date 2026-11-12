@@ -1,6 +1,6 @@
 import { env } from "node:process";
 
-import type { TSchema } from "@earendil-works/pi-ai";
+import type { Schema } from "@earendil-works/pi-schema";
 import { execution, type Idempotency } from "rebuno";
 
 import type { Manifest } from "../../registry.js";
@@ -40,7 +40,7 @@ export function registeredTool(pinned: Pinned): [NuTool, Idempotency] {
     name: pinned.name,
     label: pinned.name,
     description: pinned.description,
-    parameters: pinned.args_schema as unknown as TSchema,
+    parameters: pinned.args_schema as unknown as Schema,
     execute: async (_id, args, signal) => {
       const response = await fetch(`${RUNNER_URL}/run`, {
         method: "POST",

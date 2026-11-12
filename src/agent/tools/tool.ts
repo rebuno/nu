@@ -1,5 +1,4 @@
 import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
-import type { TSchema } from "@earendil-works/pi-ai";
 import { defineTool, execution, type Idempotency } from "rebuno";
 
 // biome-ignore lint/suspicious/noExplicitAny: a tool of any schema
@@ -10,7 +9,7 @@ export type NuTool = AnyTool & {
   before?: (params: unknown) => Promise<void>;
 };
 
-export const anyTool = <T extends TSchema>(tool: AgentTool<T>): AnyTool => tool;
+export const anyTool = <T extends object>(tool: AgentTool<T>): AnyTool => tool;
 
 export const text = (value: string): AgentToolResult<undefined> => ({
   content: [{ type: "text", text: value }],

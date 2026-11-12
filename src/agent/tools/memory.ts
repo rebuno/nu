@@ -1,4 +1,4 @@
-import { Type } from "@earendil-works/pi-ai";
+import { obj, oneOf, opt, str } from "@earendil-works/pi-schema";
 
 import type { MemoryStore } from "../memory.js";
 import { anyTool, text } from "./tool.js";
@@ -9,8 +9,8 @@ export function memoryTools(
   profile: boolean,
 ) {
   const entry = {
-    key: Type.String({ description: "Short topic key, such as `diet`" }),
-    text: Type.String(),
+    key: str({ description: "Short topic key, such as `diet`" }),
+    text: str(),
   };
   const memoryWrite = anyTool({
     name: "memory_write",
@@ -18,15 +18,14 @@ export function memoryTools(
     description: profile
       ? "Save a memory entry under a key, replacing any entry with that key; empty text deletes it. Scope `profile` holds stable facts and preferences about the user, shown at the start of every conversation. Scope `notes` holds everything else, found with memory_search."
       : "Save a note under a key, replacing any note with that key; empty text deletes it. Find notes with memory_search.",
-    parameters: Type.Object(
+    parameters: obj(
       profile
         ? {
             ...entry,
-            scope: Type.Optional(
-              Type.Union([Type.Literal("profile"), Type.Literal("notes")]),
-            ),
+            scope: opt(oneOf(["profile", "notes"])),
           }
         : entry,
+      { open: true },
     ),
     execute: async (
       _id,
@@ -46,7 +45,7 @@ export function memoryTools(
     name: "memory_search",
     label: "Recall",
     description: "Search saved notes by keywords.",
-    parameters: Type.Object({ query: Type.String() }),
+    parameters: obj({ query: str() }, { open: true }),
     execute: async (_id, { query }) => {
       const notes = await store.searchNotes(memoryScope, query, 8);
       return text(
