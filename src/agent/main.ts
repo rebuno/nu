@@ -7,15 +7,12 @@ import {
   Agent as Loop,
   type ThinkingLevel,
 } from "@earendil-works/pi-agent-core";
-import {
-  isContextOverflow,
-  normalizeContext,
-  Type,
-} from "@earendil-works/pi-ai";
+import { isContextOverflow, normalizeContext } from "@earendil-works/pi-ai";
 import {
   convertToLlm,
   loadSkillsFromDir,
 } from "@earendil-works/pi-coding-agent";
+import { obj, opt, str } from "@earendil-works/pi-schema";
 import { Agent, previous, Result, raiseForRefusal, step } from "rebuno";
 
 import pkg from "../../package.json" with { type: "json" };
@@ -306,12 +303,15 @@ function agentFor(agentId: string) {
       agentId === AGENT_ID
         ? "Nu, a personal agent"
         : `Nu's ${agentId} specialist`,
-    inputSchema: Type.Object({
-      message: Type.String(),
-      conversation: Type.Optional(Type.String()),
-      trigger: Type.Optional(Type.String()),
-    }),
-    outputSchema: Type.Object({ reply: Type.String() }),
+    inputSchema: obj(
+      {
+        message: str(),
+        conversation: opt(str()),
+        trigger: opt(str()),
+      },
+      { open: true },
+    ),
+    outputSchema: obj({ reply: str() }, { open: true }),
     secret: agentSecret,
     baseUrl: env.REBUNO_URL ?? "http://127.0.0.1:4117",
   });

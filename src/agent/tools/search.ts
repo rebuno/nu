@@ -1,7 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
-import { Type } from "@earendil-works/pi-ai";
+import { int, obj, opt, str } from "@earendil-works/pi-schema";
 
 import type { Pinned } from "./registered.js";
 import { anyTool } from "./tool.js";
@@ -79,10 +79,13 @@ export function toolSearch(
     label: "Find tools",
     description:
       "Find tools listed under <deferred_tools> and load the matches along with the other tools in their packages, so you can call them from your next step.",
-    parameters: Type.Object({
-      query: Type.String({ description: "What the tool should do" }),
-      limit: Type.Optional(Type.Integer({ description: "8 by default" })),
-    }),
+    parameters: obj(
+      {
+        query: str({ description: "What the tool should do" }),
+        limit: opt(int({ description: "8 by default" })),
+      },
+      { open: true },
+    ),
     execute: async (_id, { query, limit }) => {
       const tools = deferred();
       const groups = new Set(rankTools(tools, query, limit ?? 8).map(group));

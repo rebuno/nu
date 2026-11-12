@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { Type } from "@earendil-works/pi-ai";
+import { obj, str } from "@earendil-works/pi-schema";
 import { stringify } from "yaml";
 
 import { SKILLS_DIR } from "../../config.js";
@@ -18,16 +18,19 @@ export const skillWrite = anyTool({
   label: "Write skill",
   description:
     "Create or replace a skill: instructions for a kind of task, listed by name and description in every conversation and read when a task matches. Keep scripts it runs in the workspace and name them by absolute path. An empty body deletes the skill. Skills are available from the next turn.",
-  parameters: Type.Object({
-    name: Type.String({
-      description:
-        "Lowercase letters and digits joined by single hyphens, at most 64 characters",
-    }),
-    description: Type.String({
-      description: "When to use the skill, at most 1024 characters",
-    }),
-    body: Type.String({ description: "The instructions, in Markdown" }),
-  }),
+  parameters: obj(
+    {
+      name: str({
+        description:
+          "Lowercase letters and digits joined by single hyphens, at most 64 characters",
+      }),
+      description: str({
+        description: "When to use the skill, at most 1024 characters",
+      }),
+      body: str({ description: "The instructions, in Markdown" }),
+    },
+    { open: true },
+  ),
   execute: async (_id, { name, description, body }) => {
     if (!NAME.test(name) || name.length > 64)
       throw new Error(

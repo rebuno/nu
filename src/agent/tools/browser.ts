@@ -3,7 +3,8 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { join } from "node:path";
 
 import { Agent as Loop, type StreamFn } from "@earendil-works/pi-agent-core";
-import { type Api, type Model, Type } from "@earendil-works/pi-ai";
+import type { Api, Model } from "@earendil-works/pi-ai";
+import { obj, opt, type Schema, str } from "@earendil-works/pi-schema";
 import { type BrowserContext, chromium, type Page } from "playwright";
 import { execution, resource, step } from "rebuno";
 
@@ -146,8 +147,8 @@ function notice(handle: Handle) {
 }
 
 const ref = (r: string) => `aria-ref=${r}`;
-const profileArg = Type.Optional(
-  Type.String({ description: "Browser profile, `default` if omitted" }),
+const profileArg = opt(
+  str({ description: "Browser profile, `default` if omitted" }),
 );
 
 async function runTask(page: Page, task: string, inner: Inner) {
@@ -156,7 +157,7 @@ async function runTask(page: Page, task: string, inner: Inner) {
   const act = (
     name: string,
     description: string,
-    parameters: ReturnType<typeof Type.Object>,
+    parameters: Schema,
     run: (args: Record<string, string>) => Promise<unknown>,
   ): AnyTool =>
     anyTool({
@@ -174,32 +175,32 @@ async function runTask(page: Page, task: string, inner: Inner) {
       },
     });
   const tools = [
-    act("goto", "Open a URL.", Type.Object({ url: Type.String() }), ({ url }) =>
+    act("goto", "Open a URL.", obj({ url: str() }, { open: true }), ({ url }) =>
       page.goto(url),
     ),
     act(
       "click",
       "Click the element with a ref from the snapshot.",
-      Type.Object({ ref: Type.String() }),
+      obj({ ref: str() }, { open: true }),
       (args) => page.locator(ref(args.ref)).click(),
     ),
     act(
       "fill",
       "Replace the text in a field.",
-      Type.Object({ ref: Type.String(), text: Type.String() }),
+      obj({ ref: str(), text: str() }, { open: true }),
       (args) => page.locator(ref(args.ref)).fill(args.text),
     ),
     act(
       "select",
       "Choose an option in a select element by its label.",
-      Type.Object({ ref: Type.String(), option: Type.String() }),
+      obj({ ref: str(), option: str() }, { open: true }),
       (args) =>
         page.locator(ref(args.ref)).selectOption({ label: args.option }),
     ),
     act(
       "press",
       "Press a key, such as Enter or ArrowDown.",
-      Type.Object({ key: Type.String() }),
+      obj({ key: str() }, { open: true }),
       ({ key }) => page.keyboard.press(key),
     ),
     anyTool({
@@ -207,7 +208,7 @@ async function runTask(page: Page, task: string, inner: Inner) {
       label: "done",
       description:
         "Finish, with a summary of what you did and what is left for the submission.",
-      parameters: Type.Object({ summary: Type.String() }),
+      parameters: obj({ summary: str() }, { open: true }),
       execute: async (_id, args) => {
         summary = args.summary;
         return { ...text("Done."), terminate: true };
@@ -252,7 +253,7 @@ async function choose(page: Page, args: Record<string, string>, inner: Inner) {
           name: "submit",
           label: "submit",
           description: "The control that performs the submission.",
-          parameters: Type.Object({ ref: Type.String() }),
+          parameters: obj({ ref: str() }, { open: true }),
           execute: async (_id, { ref }) => {
             choice = { ref };
             return { ...text("OK"), terminate: true };
@@ -262,7 +263,7 @@ async function choose(page: Page, args: Record<string, string>, inner: Inner) {
           name: "mismatch",
           label: "mismatch",
           description: "The page does not match the described submission.",
-          parameters: Type.Object({ reason: Type.String() }),
+          parameters: obj({ reason: str() }, { open: true }),
           execute: async (_id, { reason }) => {
             choice = { mismatch: reason };
             return { ...text("OK"), terminate: true };
@@ -297,10 +298,13 @@ export function browserTools(model?: Inner) {
       label: "Observe page",
       description:
         "Read the current page of a browser profile as an accessibility snapshot, opening a URL first if given. Profiles keep their cookies and logins between turns.",
-      parameters: Type.Object({
-        profile: profileArg,
-        url: Type.Optional(Type.String()),
-      }),
+      parameters: obj(
+        {
+          profile: profileArg,
+          url: opt(str()),
+        },
+        { open: true },
+      ),
       execute: async (_id, { profile, url }) => {
         const handle = browser(profile ?? "default");
         if (url) await handle.page.goto(url);
@@ -315,7 +319,7 @@ export function browserTools(model?: Inner) {
       label: "Browser task",
       description:
         "Carry out a described task in a browser profile, such as filling in a form, stopping before any submission. Form submissions are blocked during the task; use browser_submit for the final one.",
-      parameters: Type.Object({ profile: profileArg, task: Type.String() }),
+      parameters: obj({ profile: profileArg, task: str() }, { open: true }),
       execute: async (_id, args) => {
         const handle = browser(args.profile ?? "default");
         const summary = await runTask(handle.page, args.task, inner());
@@ -332,12 +336,15 @@ export function browserTools(model?: Inner) {
       label: "Submit",
       description:
         "Perform one submission on the current page of a browser profile, after checking that the page matches the description. `site` is the page's domain, `action` the button or action (such as 'Place order'), and `summary` what is submitted.",
-      parameters: Type.Object({
-        profile: profileArg,
-        site: Type.String(),
-        action: Type.String(),
-        summary: Type.String(),
-      }),
+      parameters: obj(
+        {
+          profile: profileArg,
+          site: str(),
+          action: str(),
+          summary: str(),
+        },
+        { open: true },
+      ),
       execute: async (_id, args) => {
         const handle = browser(args.profile ?? "default");
         const { page } = handle;
@@ -363,12 +370,15 @@ export function browserTools(model?: Inner) {
       label: "Hand off to user",
       description:
         "Ask the user to complete a step in a browser profile themselves, such as a login, a CAPTCHA, or a verification code. The user gets a link to an interactive view of the current page and approves this call when done; the result is the page afterwards. The profile keeps the login for later tasks.",
-      parameters: Type.Object({
-        profile: profileArg,
-        reason: Type.String({
-          description: "What the user needs to do on the page",
-        }),
-      }),
+      parameters: obj(
+        {
+          profile: profileArg,
+          reason: str({
+            description: "What the user needs to do on the page",
+          }),
+        },
+        { open: true },
+      ),
       execute: async (_id, { profile }) => {
         const handle = browser(profile ?? "default");
         return text(notice(handle) + (await describe(handle.page)));
